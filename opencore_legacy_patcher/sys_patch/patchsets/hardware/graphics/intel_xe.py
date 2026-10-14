@@ -6,7 +6,8 @@ from ...base import PatchType
 
 class IntelXeLP(BaseHardware):
     # Implemented WhateverXe backends; catalogued but unsupported families are excluded.
-    DEVICE_IDS = {0x9A40, 0x9A49, 0x9A78, 0x46D0, 0x46D1, 0x46D2, 0x46D3, 0x46D4}
+    # 0xA7A8: Raptor Lake-P (fork branch rplp-r3, revision 4 only, opt-in via -wex-rplp-gt).
+    DEVICE_IDS = {0x9A40, 0x9A49, 0x9A78, 0x46D0, 0x46D1, 0x46D2, 0x46D3, 0x46D4, 0xA7A8}
 
     def name(self) -> str:
         return f"{self.hardware_variant()}: Intel Xe-LP"

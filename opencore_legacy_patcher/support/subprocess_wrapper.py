@@ -5,6 +5,7 @@ subprocess_wrapper.py: Wrapper for subprocess module to better handle errors and
 
 import enum
 import logging
+import os
 import subprocess
 
 from pathlib import Path
@@ -50,6 +51,18 @@ def run_as_root(*args, **kwargs) -> subprocess.CompletedProcess:
     # Check if first argument exists
     if not Path(args[0][0]).exists():
         raise FileNotFoundError(f"File not found: {args[0][0]}")
+
+    # Already root (a source run launched with 'sudo python3 OpenCore-Patcher-GUI.command'):
+    # run the command directly. The helper only exists to escalate for the signed app.
+    if os.geteuid() == 0:
+        return subprocess.run([args[0][0]] + args[0][1:], **kwargs)
+
+    if not Path(OCLP_PRIVILEGED_HELPER).exists():
+        raise FileNotFoundError(
+            f"Privileged Helper Tool not installed: {OCLP_PRIVILEGED_HELPER}. "
+            "Running from source: launch the patcher with sudo, or build and install the helper "
+            "(see ci_tooling/privileged_helper_tool/README.md)."
+        )
 
     return subprocess.run([OCLP_PRIVILEGED_HELPER] + [args[0][0]] + args[0][1:], **kwargs)
 
